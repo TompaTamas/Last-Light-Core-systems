@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Light Skin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1 class="title">SURVIVOR APPEARANCE</h1>
+                <p class="subtitle">Character Customization</p>
+            </div>
+            <div class="header-right">
+                <div class="price-box" id="price-box">
+                    <span class="price-label">COST</span>
+                    <span class="price-value" id="price-value">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="container">
+            <!-- Sidebar (Categories) -->
+            <div class="sidebar">
+                <div class="category-list">
+                    <div class="category-item active" data-category="heritage">
+                        <div class="category-icon">🧬</div>
+                        <span class="category-label">Heritage</span>
+                    </div>
+                    <div class="category-item" data-category="face">
+                        <div class="category-icon">👤</div>
+                        <span class="category-label">Face</span>
+                    </div>
+                    <div class="category-item" data-category="appearance">
+                        <div class="category-icon">💇</div>
+                        <span class="category-label">Appearance</span>
+                    </div>
+                    <div class="category-item" data-category="clothes">
+                        <div class="category-icon">👕</div>
+                        <span class="category-label">Clothes</span>
+                    </div>
+                    <div class="category-item" data-category="accessories">
+                        <div class="category-icon">👓</div>
+                        <span class="category-label">Accessories</span>
+                    </div>
+                    <div class="category-item" data-category="tattoos">
+                        <div class="category-icon">🎨</div>
+                        <span class="category-label">Tattoos</span>
+                    </div>
+                    <div class="category-item" data-category="outfits">
+                        <div class="category-icon">👗</div>
+                        <span class="category-label">Outfits</span>
+                    </div>
+                </div>
+
+                <!-- Camera Controls -->
+                <div class="camera-controls">
+                    <div class="camera-label">CAMERA</div>
+                    <div class="camera-buttons">
+                        <button class="camera-btn" data-camera="head">👤</button>
+                        <button class="camera-btn active" data-camera="body">🧍</button>
+                        <button class="camera-btn" data-camera="legs">🦵</button>
+                        <button class="camera-btn" data-camera="feet">👟</button>
+                        <button class="camera-btn" data-camera="full">🔄</button>
+                    </div>
+                    <div class="camera-hint">🖱️ Drag to rotate</div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content">
+                <!-- Heritage -->
+                <div class="content-section active" id="section-heritage">
+                    <h2 class="section-title">GENETIC HERITAGE</h2>
+                    <div class="content-grid">
+                        <!-- Mother -->
+                        <div class="control-group">
+                            <label class="control-label">MOTHER</label>
+                            <div class="slider-container">
+                                <input type="range" class="slider" id="heritage-mother" min="0" max="20" value="0">
+                                <span class="slider-value">0</span>
+                            </div>
+                        </div>
+                        <!-- Father -->
+                        <div class="control-group">
+                            <label class="control-label">FATHER</label>
+                            <div class="slider-container">
+                                <input type="range" class="slider" id="heritage-father" min="0" max="22" value="0">
+                                <span class="slider-value">0</span>
+                            </div>
+                        </div>
+                        <!-- Similarity -->
+                        <div class="control-group">
+                            <label class="control-label">SIMILARITY</label>
+                            <div class="slider-container">
+                                <input type="range" class="slider" id="heritage-similarity" min="0" max="100" value="50">
+                                <span class="slider-value">50%</span>
+                            </div>
+                        </div>
+                        <!-- Skin Similarity -->
+                        <div class="control-group">
+                            <label class="control-label">SKIN TONE</label>
+                            <div class="slider-container">
+                                <input type="range" class="slider" id="heritage-skin" min="0" max="100" value="50">
+                                <span class="slider-value">50%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Face Features -->
+                <div class="content-section" id="section-face">
+                    <h2 class="section-title">FACIAL FEATURES</h2>
+                    <div class="content-grid" id="face-features-grid">
+                        <!-- Face features will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Appearance -->
+                <div class="content-section" id="section-appearance">
+                    <h2 class="section-title">APPEARANCE</h2>
+                    <div class="appearance-tabs">
+                        <button class="tab-btn active" data-tab="hair">Hair</button>
+                        <button class="tab-btn" data-tab="facial">Facial Hair</button>
+                        <button class="tab-btn" data-tab="eyebrows">Eyebrows</button>
+                        <button class="tab-btn" data-tab="makeup">Makeup</button>
+                        <button class="tab-btn" data-tab="eyes">Eyes</button>
+                    </div>
+                    <div class="tab-content" id="appearance-content">
+                        <!-- Content changes based on tab -->
+                    </div>
+                </div>
+
+                <!-- Clothes -->
+                <div class="content-section" id="section-clothes">
+                    <h2 class="section-title">CLOTHING</h2>
+                    <div class="clothes-tabs">
+                        <button class="tab-btn active" data-component="11">Jacket</button>
+                        <button class="tab-btn" data-component="8">Shirt</button>
+                        <button class="tab-btn" data-component="4">Pants</button>
+                        <button class="tab-btn" data-component="6">Shoes</button>
+                        <button class="tab-btn" data-component="1">Mask</button>
+                        <button class="tab-btn" data-component="5">Bag</button>
+                    </div>
+                    <div class="clothes-content" id="clothes-content">
+                        <div class="clothes-controls">
+                            <div class="control-group">
+                                <label class="control-label">TYPE</label>
+                                <div class="arrow-select">
+                                    <button class="arrow-btn" id="clothes-drawable-prev">◀</button>
+                                    <span class="arrow-value" id="clothes-drawable-value">0</span>
+                                    <button class="arrow-btn" id="clothes-drawable-next">▶</button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">VARIANT</label>
+                                <div class="arrow-select">
+                                    <button class="arrow-btn" id="clothes-texture-prev">◀</button>
+                                    <span class="arrow-value" id="clothes-texture-value">0</span>
+                                    <button class="arrow-btn" id="clothes-texture-next">▶</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accessories -->
+                <div class="content-section" id="section-accessories">
+                    <h2 class="section-title">ACCESSORIES</h2>
+                    <div class="accessories-grid">
+                        <div class="accessory-card" data-prop="0">
+                            <div class="accessory-icon">🎩</div>
+                            <div class="accessory-label">Hat</div>
+                            <div class="accessory-controls">
+                                <button class="arrow-btn small" data-action="prev">◀</button>
+                                <span class="accessory-value">None</span>
+                                <button class="arrow-btn small" data-action="next">▶</button>
+                            </div>
+                        </div>
+                        <div class="accessory-card" data-prop="1">
+                            <div class="accessory-icon">👓</div>
+                            <div class="accessory-label">Glasses</div>
+                            <div class="accessory-controls">
+                                <button class="arrow-btn small" data-action="prev">◀</button>
+                                <span class="accessory-value">None</span>
+                                <button class="arrow-btn small" data-action="next">▶</button>
+                            </div>
+                        </div>
+                        <div class="accessory-card" data-prop="2">
+                            <div class="accessory-icon">👂</div>
+                            <div class="accessory-label">Earring</div>
+                            <div class="accessory-controls">
+                                <button class="arrow-btn small" data-action="prev">◀</button>
+                                <span class="accessory-value">None</span>
+                                <button class="arrow-btn small" data-action="next">▶</button>
+                            </div>
+                        </div>
+                        <div class="accessory-card" data-prop="6">
+                            <div class="accessory-icon">⌚</div>
+                            <div class="accessory-label">Watch</div>
+                            <div class="accessory-controls">
+                                <button class="arrow-btn small" data-action="prev">◀</button>
+                                <span class="accessory-value">None</span>
+                                <button class="arrow-btn small" data-action="next">▶</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tattoos -->
+                <div class="content-section" id="section-tattoos">
+                    <h2 class="section-title">TATTOOS</h2>
+                    <div class="tattoos-container">
+                        <div class="tattoo-list" id="tattoo-list">
+                            <div class="empty-state">
+                                <div class="empty-icon">🎨</div>
+                                <p>No tattoos yet</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" id="add-tattoo-btn">+ ADD TATTOO</button>
+                    </div>
+                </div>
+
+                <!-- Outfits -->
+                <div class="content-section" id="section-outfits">
+                    <h2 class="section-title">SAVED OUTFITS</h2>
+                    <div class="outfits-container">
+                        <div class="outfit-grid" id="outfit-grid">
+                            <div class="empty-state">
+                                <div class="empty-icon">👗</div>
+                                <p>No saved outfits</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" id="save-outfit-btn">💾 SAVE CURRENT OUTFIT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="footer">
+            <button class="btn btn-secondary" id="reset-btn">RESET</button>
+            <button class="btn btn-danger" id="close-btn">CANCEL</button>
+            <button class="btn btn-primary" id="save-btn">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

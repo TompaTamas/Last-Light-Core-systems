@@ -1,0 +1,345 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    pointer-events: none !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: transparent !important; /* Kulcs: átlátszó háttér */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+/* Notification Container */
+#notification-container {
+    position: fixed;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+/* Position Classes */
+#notification-container.top-right {
+    top: 20px;
+    right: 20px;
+}
+
+#notification-container.top-left {
+    top: 20px;
+    left: 20px;
+}
+
+#notification-container.top-center {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#notification-container.bottom-right {
+    bottom: 20px;
+    right: 20px;
+}
+
+#notification-container.bottom-left {
+    bottom: 20px;
+    left: 20px;
+}
+
+#notification-container.bottom-center {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Notification Box */
+.notification {
+    min-width: 300px;
+    max-width: 400px;
+    padding: 16px 20px;
+    background: rgba(30, 30, 30, 0.95);
+    border-radius: 12px;
+    border-left: 4px solid #3b82f6;
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: slideIn 0.3s ease-out;
+    pointer-events: all;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.notification:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+}
+
+.notification.closing {
+    animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.notification.pulse {
+    animation: slideIn 0.3s ease-out, pulse 2s ease-in-out infinite;
+}
+
+.notification.shake {
+    animation: slideIn 0.3s ease-out, shake 0.5s ease-in-out;
+}
+
+/* Icon */
+.notification-icon {
+    font-size: 24px;
+    line-height: 1;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Content */
+.notification-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notification-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.notification-message {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+/* Close button */
+.notification-close {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+}
+
+.notification-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Progress bar in notification */
+.notification-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.notification-progress-bar {
+    height: 100%;
+    background: white;
+    border-radius: 2px;
+    transition: width 0.1s linear;
+}
+
+/* Type Colors */
+.notification.success { border-left-color: #10b981; }
+.notification.error { border-left-color: #ef4444; }
+.notification.warning { border-left-color: #f59e0b; }
+.notification.info { border-left-color: #3b82f6; }
+.notification.radiation { border-left-color: #84cc16; }
+.notification.zombie { border-left-color: #dc2626; }
+.notification.sanity { border-left-color: #8b5cf6; }
+.notification.infection { border-left-color: #059669; }
+.notification.hunger { border-left-color: #f97316; }
+.notification.thirst { border-left-color: #0ea5e9; }
+
+/* Persistent Container */
+#persistent-container {
+    position: fixed;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.persistent-notification {
+    min-width: 280px;
+    padding: 14px 18px;
+    background: rgba(20, 20, 20, 0.95);
+    border-radius: 10px;
+    border-left: 3px solid #3b82f6;
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.3s ease-out;
+    pointer-events: all;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Progress Container */
+#progress-container {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+}
+
+.progress-box {
+    min-width: 400px;
+    padding: 20px 24px;
+    background: rgba(20, 20, 20, 0.0);
+    border-radius: 12px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.progress-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.progress-bar-wrapper {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 4px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.progress-percentage {
+    font-weight: 600;
+    color: #60a5fa;
+}
+
+.progress-cancel {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .notification {
+        min-width: 280px;
+        max-width: 340px;
+    }
+    
+    .progress-box {
+        min-width: 320px;
+    }
+    
+    #notification-container {
+        left: 10px;
+        right: 10px;
+    }
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Light Notify</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+    
+    <!-- Persistent Container -->
+    <div id="persistent-container"></div>
+    
+    <!-- Progress Container -->
+    <div id="progress-container" class="hidden">
+        <div class="progress-box">
+            <div class="progress-label" id="progress-label">Loading...</div>
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-info">
+                <span class="progress-percentage" id="progress-percentage">0%</span>
+                <span class="progress-cancel">ESC - Cancel</span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
