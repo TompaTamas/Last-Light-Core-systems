@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Light - Account</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background -->
+    <div class="background">
+        <div class="background-overlay"></div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="app" class="hidden">
+        
+        <!-- Character Selection Screen -->
+        <div id="character-selection" class="screen hidden">
+            <div class="header">
+                <h1 class="title">LAST LIGHT</h1>
+                <p class="subtitle">Survival Selection</p>
+            </div>
+            
+            <div class="characters-container">
+                <div class="characters-grid" id="characters-grid">
+                    <!-- Characters will be inserted here -->
+                </div>
+                
+                <!-- Empty slot -->
+                <div class="character-card character-empty" id="create-character-btn">
+                    <div class="character-empty-content">
+                        <div class="plus-icon">+</div>
+                        <p class="create-text" data-i18n="create_new">Új Karakter</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-actions">
+                <button class="btn btn-primary" id="play-btn" disabled>
+                    <span data-i18n="play">Játék</span>
+                </button>
+                <button class="btn btn-danger" id="delete-btn" disabled>
+                    <span data-i18n="delete">Törlés</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Character Creator Screen -->
+        <div id="character-creator" class="screen hidden">
+            <div class="creator-header">
+                <h2 class="title" data-i18n="create_character">Karakter Létrehozása</h2>
+                <button class="btn-close" id="creator-close">&times;</button>
+            </div>
+            
+            <div class="creator-content">
+                <!-- Step 1: Basic Info -->
+                <div class="creator-step active" id="step-basic">
+                    <h3 class="step-title" data-i18n="character_info">Karakter Információ</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label data-i18n="first_name">Keresztnév</label>
+                            <input type="text" id="firstname" class="form-input" placeholder="John" maxlength="20">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-i18n="last_name">Vezetéknév</label>
+                            <input type="text" id="lastname" class="form-input" placeholder="Doe" maxlength="20">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-i18n="date_of_birth">Születési Dátum</label>
+                            <input type="date" id="dateofbirth" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-i18n="height">Magasság (cm)</label>
+                            <input type="number" id="height" class="form-input" value="175" min="150" max="220">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group gender-group">
+                        <label data-i18n="gender">Nem</label>
+                        <div class="gender-buttons">
+                            <button class="gender-btn active" data-gender="m">
+                                <span data-i18n="male">Férfi</span>
+                            </button>
+                            <button class="gender-btn" data-gender="f">
+                                <span data-i18n="female">Nő</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Spawn Selection -->
+                <div class="creator-step" id="step-spawn">
+                    <h3 class="step-title" data-i18n="select_spawn">Válassz Spawn Pontot</h3>
+                    
+                    <div class="spawn-grid" id="spawn-grid">
+                        <!-- Spawn locations will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="creator-footer">
+                <button class="btn btn-secondary" id="creator-back" data-i18n="back">Vissza</button>
+                <button class="btn btn-primary" id="creator-next" data-i18n="next">Következő</button>
+                <button class="btn btn-success hidden" id="creator-finish" data-i18n="finish">Befejezés</button>
+            </div>
+        </div>
+        
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3 class="modal-title" data-i18n="confirm">Megerősítés</h3>
+                <p class="modal-text" id="delete-text"></p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancel-delete" data-i18n="cancel">Mégse</button>
+                    <button class="btn btn-danger" id="confirm-delete" data-i18n="delete">Törlés</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
