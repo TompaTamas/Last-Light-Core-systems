@@ -1,7 +1,11 @@
 Account = {}
 Account.IsInCharacterSelection = false
+Account.IsLoggedIn = false
 Account.CurrentCharacter = nil
 Account.Characters = {}
+Account.CurrentCamera = nil
+Account.SelectedSpawn = nil
+Account.OriginalPed = nil
 
 -- Lokalizáció
 function _(str, ...)
@@ -91,21 +95,23 @@ function Account.SetupSelectionCamera()
         Config.SelectionCamera.Height
     )
     
-    SetCamCoord(cam, camCoords)
+    SetCamCoord(cam, camCoords.x, camCoords.y, camCoords.z)
     PointCamAtEntity(cam, playerPed, 0.0, 0.0, 0.0, true)
     SetCamFov(cam, Config.SelectionCamera.Fov)
     SetCamActive(cam, true)
     RenderScriptCams(true, false, 0, true, true)
     
     Account.CurrentCamera = cam
+    Account.Debug('Selection camera created')
 end
 
 -- Kamera törlése
 function Account.DestroyCamera()
-    if Account.CurrentCamera then
+    if Account.CurrentCamera and DoesCamExist(Account.CurrentCamera) then
         RenderScriptCams(false, false, 0, true, true)
         DestroyCam(Account.CurrentCamera, false)
         Account.CurrentCamera = nil
+        Account.Debug('Camera destroyed')
     end
 end
 
@@ -209,11 +215,19 @@ function Account.FreezePlayer(freeze)
     local ped = PlayerPedId()
     FreezeEntityPosition(ped, freeze)
     SetPlayerInvincible(PlayerId(), freeze)
+    SetEntityCollision(ped, not freeze, not freeze)
     
     if freeze then
         SetEntityVisible(ped, false, false)
+        SetEntityAlpha(ped, 0, false)
+        DisplayHud(false)
+        DisplayRadar(false)
     else
         SetEntityVisible(ped, true, false)
+        SetEntityAlpha(ped, 255, false)
+        ResetEntityAlpha(ped)
+        DisplayHud(true)
+        DisplayRadar(true)
     end
 end
 
@@ -231,12 +245,77 @@ end
 
 -- Tutorial megjelenítés
 function Account.ShowTutorial()
-    if not Config.Tutorial.Enable or not Config.Tutorial.ShowForNewPlayers then
+    if not Config.Tutorial or not Config.Tutorial.Enable or not Config.Tutorial.ShowForNewPlayers then
+        return
+    end
+    
+    if not Config.Tutorial.Steps then
         return
     end
     
     for i, step in ipairs(Config.Tutorial.Steps) do
-        Citizen.Wait(step.duration)
-        Account.Notify(step.description, 'info', step.duration)
+        Citizen.Wait(step.duration or 5000)
+        Account.Notify(step.description, 'info', step.duration or 5000)
+    end
+end
+
+-- Cleanup függvények (fallback ha character.lua nem töltődött)
+function Account.DestroyCharacterPreview()
+    Account.Debug('DestroyCharacterPreview called (fallback)')
+    -- Ez a character.lua-ban van implementálva
+end
+
+function Account.DestroyCreatorPed()
+    Account.Debug('DestroyCreatorPed called (fallback)')
+    -- Ez a character.lua-ban van implementálva
+end
+
+function Account.CreateCharacterPreview(character)
+    Account.Debug('CreateCharacterPreview called (fallback)')
+    -- Ez a character.lua-ban van implementálva
+end
+
+function Account.CreateCreatorPed(gender)
+    Account.Debug('CreateCreatorPed called (fallback)')
+    -- Ez a character.lua-ban van implementálva
+end
+
+-- Kezdő csomag kiosztása
+function Account.GiveStartingKit()
+    if not Config.StartingKit or not Config.StartingKit.Enable then return end
+    
+    Account.Debug('Giving starting kit')
+    
+    -- Notify
+    if GetResourceState('ll-notify') == 'started' then
+        exports['ll-notify']:Info(_('starting_kit'), 5000, _('welcome_survivor'))
+    end
+    
+    -- Kezdő itemek
+    if Config.StartingKit.Items and #Config.StartingKit.Items > 0 then
+        if GetResourceState('ll-inventory') == 'started' then
+            for _, item in pairs(Config.StartingKit.Items) do
+                TriggerServerEvent('ll-inventory:server:addItem', item.item, item.count)
+                Account.Debug('Added item: ' .. item.item .. ' x' .. item.count)
+            end
+        end
+    end
+    
+    -- Kezdő pénz (ll-core)
+    if Config.StartingKit.Money then
+        if Config.StartingKit.Money.cash and Config.StartingKit.Money.cash > 0 then
+            TriggerServerEvent('ll-account:server:addStartingMoney', 'cash', Config.StartingKit.Money.cash)
+            Account.Debug('Added cash: $' .. Config.StartingKit.Money.cash)
+        end
+        
+        if Config.StartingKit.Money.bank and Config.StartingKit.Money.bank > 0 then
+            TriggerServerEvent('ll-account:server:addStartingMoney', 'bank', Config.StartingKit.Money.bank)
+            Account.Debug('Added bank: $' .. Config.StartingKit.Money.bank)
+        end
+    end
+    
+    -- Apokalipszis kezdő státuszok szerverhez
+    if Config.StartingKit.ApocalypseStats then
+        TriggerServerEvent('ll-account:server:setStartingStats', Config.StartingKit.ApocalypseStats)
     end
 end

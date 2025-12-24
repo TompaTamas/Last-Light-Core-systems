@@ -2,7 +2,7 @@ Config = {}
 
 -- Alap beállítások
 Config.Locale = 'hu'
-Config.Debug = false
+Config.Debug = true
 
 -- Menü megnyitás
 Config.Menu = {
@@ -10,7 +10,8 @@ Config.Menu = {
     Key = 'F7',                 -- F7 billentyű
     KeyCode = 168,              -- F7 key code
     EnableCommand = true,       -- Parancs engedélyezése
-    EnableKey = false,           -- Billentyű engedélyezése
+    EnableKey = false,          -- Billentyű engedélyezése
+    Show3DText = true,          -- 3D text marker boltok előtt
     
     -- Hozzáférés
     AllowEverywhere = false,    -- Bárhol megnyitható

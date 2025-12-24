@@ -56,37 +56,6 @@ function Skin.OpenMenu()
     Skin.Debug('Menu opened')
 end
 
--- Menü bezárása
-function Skin.CloseMenu(save)
-    if save then
-        -- Mentés
-        if Skin.HasEnoughMoney() then
-            Skin.PayForChanges()
-            TriggerServerEvent('ll-skin:server:save', Skin.CurrentSkin)
-            Skin.Notify(_('saved_successfully'), 'success')
-        else
-            Skin.Notify(_('not_enough_money', Config.Menu.Price), 'error')
-            Skin.ApplySkin(Skin.OriginalSkin)
-        end
-    else
-        -- Visszaállítás
-        Skin.ApplySkin(Skin.OriginalSkin)
-    end
-    
-    Skin.IsMenuOpen = false
-    SetNuiFocus(false, false)
-    
-    SendNUIMessage({
-        action = 'closeMenu'
-    })
-    
-    -- Kamera törlése
-    if Skin.Camera then
-        Skin.DestroyCamera()
-    end
-    
-    Skin.Debug('Menu closed')
-end
 
 -- NUI Callbacks
 RegisterNUICallback('close', function(data, cb)
@@ -195,59 +164,6 @@ function Skin.UpdateProp(prop, drawable, texture)
     end
 end
 
--- Haj frissítése
-function Skin.UpdateHair(style, color, highlight)
-    local ped = PlayerPedId()
-    
-    Skin.CurrentSkin.hair = {
-        style = style,
-        color = color,
-        highlight = highlight
-    }
-    
-    SetPedComponentVariation(ped, 2, style, 0, 0)
-    SetPedHairColor(ped, color, highlight)
-end
-
--- Overlay frissítése
-function Skin.UpdateOverlay(overlay, style, color, opacity)
-    local ped = PlayerPedId()
-    local overlayId = SkinData.Overlays[overlay]
-    
-    if not overlayId then return end
-    
-    if not Skin.CurrentSkin[overlay] then
-        Skin.CurrentSkin[overlay] = {}
-    end
-    
-    Skin.CurrentSkin[overlay].style = style
-    Skin.CurrentSkin[overlay].color = color
-    Skin.CurrentSkin[overlay].opacity = opacity
-    
-    SetPedHeadOverlay(ped, overlayId, style, opacity)
-    
-    if color then
-        local colorType = (overlay == 'makeup' or overlay == 'lipstick') and 2 or 1
-        SetPedHeadOverlayColor(ped, overlayId, colorType, color, color)
-    end
-end
-
--- Face feature frissítése
-function Skin.UpdateFaceFeature(feature, value)
-    local ped = PlayerPedId()
-    local featureId = SkinData.FaceFeatures[feature]
-    
-    if not featureId then return end
-    
-    if not Skin.CurrentSkin.face then
-        Skin.CurrentSkin.face = {}
-    end
-    
-    Skin.CurrentSkin.face[feature] = value
-    
-    SetPedFaceFeature(ped, featureId, value)
-end
-
 -- Deep copy helper
 function Skin.DeepCopy(original)
     local copy
@@ -267,7 +183,7 @@ Citizen.CreateThread(function()
     -- Clothing shops
     for _, shop in pairs(Config.ClothingShops) do
         if shop.blip then
-            local blip = AddBlipForCoord(shop.coords)
+            local blip = AddBlipForCoord(shop.coords.x, shop.coords.y, shop.coords.z)
             SetBlipSprite(blip, Config.Blips.ClothingShop.sprite)
             SetBlipColour(blip, Config.Blips.ClothingShop.color)
             SetBlipScale(blip, Config.Blips.ClothingShop.scale)
@@ -281,7 +197,7 @@ Citizen.CreateThread(function()
     -- Barber shops
     for _, shop in pairs(Config.BarberShops) do
         if shop.blip then
-            local blip = AddBlipForCoord(shop.coords)
+            local blip = AddBlipForCoord(shop.coords.x, shop.coords.y, shop.coords.z)
             SetBlipSprite(blip, Config.Blips.BarberShop.sprite)
             SetBlipColour(blip, Config.Blips.BarberShop.color)
             SetBlipScale(blip, Config.Blips.BarberShop.scale)

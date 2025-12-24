@@ -1,3 +1,4 @@
+Locales = Locales or {}
 Locales['hu'] = {
     -- Menü
     ['skin_menu'] = 'Megjelenés Szerkesztő',

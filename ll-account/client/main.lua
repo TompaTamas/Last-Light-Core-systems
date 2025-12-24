@@ -37,6 +37,11 @@ RegisterNetEvent('ll-account:client:showRegistration', function()
     
     Citizen.SetTimeout(500, function()
         Account.OpenCharacterCreator()
+        
+        -- Creator ped létrehozása
+        Citizen.SetTimeout(1000, function()
+            Account.CreateCreatorPed('m')
+        end)
     end)
 end)
 

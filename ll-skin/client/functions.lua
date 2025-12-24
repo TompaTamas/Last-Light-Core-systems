@@ -74,14 +74,12 @@ function Skin.GetCurrentSkin()
     -- Overlays
     skin.eyebrows = {
         style = GetPedHeadOverlayValue(ped, 2),
-        color = GetPedHeadOverlayColor(ped, 2),
-        opacity = GetPedHeadOverlay(ped, 2)
+        opacity = 1.0
     }
     
     skin.beard = {
         style = GetPedHeadOverlayValue(ped, 1),
-        color = GetPedHeadOverlayColor(ped, 1),
-        opacity = GetPedHeadOverlay(ped, 1)
+        opacity = 1.0
     }
     
     skin.eyeColor = GetPedEyeColor(ped)
@@ -173,8 +171,8 @@ function Skin.ApplySkin(skin, ped)
     
     -- Hair
     if skin.hair then
-        SetPedHair(ped, skin.hair.style or 0, skin.hair.color or 0, skin.hair.highlight or 0)
         SetPedComponentVariation(ped, 2, skin.hair.style or 0, 0, 0)
+        SetPedHairColor(ped, skin.hair.color or 0, skin.hair.highlight or 0)
     end
     
     -- Overlays

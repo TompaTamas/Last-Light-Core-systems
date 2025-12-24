@@ -543,3 +543,46 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Add this to the #app style in your existing style.css */
+
+#app {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('assets/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Rajdhani', sans-serif;
+    color: white;
+    overflow: hidden;
+    z-index: 9999;
+    
+    /* Fade transition */
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+
+#app.hidden {
+    display: none !important;
+    opacity: 0;
+}
+
+/* Background overlay */
+#app::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
+

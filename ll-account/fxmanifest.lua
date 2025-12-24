@@ -2,35 +2,38 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'Last Light Development'
-description 'Last Light Account - Fiókkezelő és karakterválasztó rendszer'
+description 'Last Light Account System - Login, Registration, Character Management'
 version '1.0.0'
 
--- Lua 5.4 használata
 lua54 'yes'
 
--- Shared fájlok
+-- Shared
 shared_scripts {
     'config.lua',
     'locales/*.lua'
 }
 
--- Kliens oldali scriptek
+-- Client
 client_scripts {
+    'client/init.lua',
     'client/functions.lua',
     'client/main.lua',
-    'client/character.lua',
-    'client/spawn.lua'
+    'client/creator.lua',
+    'client/spawn.lua',
+    'client/tutorial.lua',
+    'client/debug.lua'
 }
 
--- Szerver oldali scriptek
+-- Server
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/functions.lua',
     'server/main.lua',
-    'server/character.lua'
+    'server/character.lua',
+    'server/spawn_events.lua'
 }
 
--- NUI fájlok
+-- NUI
 ui_page 'html/index.html'
 
 files {

@@ -2,7 +2,7 @@ Config = {}
 
 -- Alap beállítások
 Config.Locale = 'hu'
-Config.Debug = false
+Config.Debug = true
 
 -- Karakter beállítások
 Config.Character = {

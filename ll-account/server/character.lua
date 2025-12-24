@@ -63,8 +63,18 @@ RegisterNetEvent('ll-account:server:createCharacter', function(data)
             {name = 'bank', money = Config.StartingKit.Money.bank or 0}
         })
         
-        -- Alap skin (később ll-skin-ből jön)
-        local defaultSkin = json.encode({})
+        -- Alap skin
+        local defaultSkin = data.skin or json.encode({
+            model = data.gender == 'm' and 'mp_m_freemode_01' or 'mp_f_freemode_01',
+            heritage = {
+                mom = 0,
+                dad = 0,
+                similarity = 0.5,
+                skin_similarity = 0.5
+            },
+            components = {},
+            props = {}
+        })
         
         -- Karakter létrehozása
         MySQL.Async.insert([[
