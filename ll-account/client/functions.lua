@@ -1,10 +1,9 @@
-Account = {}
+-- Account functions (NE inicializálja újra az Account-ot!)
+
+-- Account tábla már létezik az init.lua-ból
 Account.IsInCharacterSelection = false
-Account.IsLoggedIn = false
-Account.CurrentCharacter = nil
 Account.Characters = {}
 Account.CurrentCamera = nil
-Account.SelectedSpawn = nil
 Account.OriginalPed = nil
 
 -- Lokalizáció
@@ -262,22 +261,18 @@ end
 -- Cleanup függvények (fallback ha character.lua nem töltődött)
 function Account.DestroyCharacterPreview()
     Account.Debug('DestroyCharacterPreview called (fallback)')
-    -- Ez a character.lua-ban van implementálva
 end
 
 function Account.DestroyCreatorPed()
     Account.Debug('DestroyCreatorPed called (fallback)')
-    -- Ez a character.lua-ban van implementálva
 end
 
 function Account.CreateCharacterPreview(character)
     Account.Debug('CreateCharacterPreview called (fallback)')
-    -- Ez a character.lua-ban van implementálva
 end
 
 function Account.CreateCreatorPed(gender)
     Account.Debug('CreateCreatorPed called (fallback)')
-    -- Ez a character.lua-ban van implementálva
 end
 
 -- Kezdő csomag kiosztása
@@ -301,7 +296,7 @@ function Account.GiveStartingKit()
         end
     end
     
-    -- Kezdő pénz (ll-core)
+    -- Kezdő pénz
     if Config.StartingKit.Money then
         if Config.StartingKit.Money.cash and Config.StartingKit.Money.cash > 0 then
             TriggerServerEvent('ll-account:server:addStartingMoney', 'cash', Config.StartingKit.Money.cash)

@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Last Light Development'
 description 'Last Light Account System - Login, Registration, Character Management'
-version '1.0.0'
+version '2.0.0'
 
 lua54 'yes'
 
@@ -18,10 +18,10 @@ client_scripts {
     'client/init.lua',
     'client/functions.lua',
     'client/main.lua',
-    'client/creator.lua',
     'client/spawn.lua',
     'client/tutorial.lua',
     'client/debug.lua'
+    -- creator.lua TÖRÖLVE - ll-skin-t használunk
 }
 
 -- Server
@@ -49,5 +49,6 @@ files {
 -- Dependencies
 dependencies {
     'oxmysql',
-    'll-core'
+    'll-core',
+    'll-skin'  -- FONTOS: ll-skin dependency!
 }

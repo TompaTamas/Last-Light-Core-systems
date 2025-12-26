@@ -3,171 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Last Light - Account</title>
+    <title>Last Light Account</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Background -->
-    <div class="background">
-        <div class="background-overlay"></div>
-        <div class="particles" id="particles"></div>
-    </div>
-
-    <!-- Main Container -->
     <div id="app" class="hidden">
         
-        <!-- Character Selection Screen -->
-        <div id="character-selection" class="screen hidden">
-            <div class="header">
-                <h1 class="title">LAST LIGHT</h1>
-                <p class="subtitle">Survival Selection</p>
+        <!-- Character Selection -->
+        <div id="character-selection" class="hidden">
+            <div class="selection-header">
+                <h1 class="selection-title">SELECT YOUR CHARACTER</h1>
+                <p class="selection-subtitle">Choose a survivor or create a new one</p>
             </div>
             
-            <div class="characters-container">
-                <div class="characters-grid" id="characters-grid">
-                    <!-- Characters will be inserted here -->
-                </div>
-                
-                <!-- Empty slot -->
-                <div class="character-card character-empty" id="create-character-btn">
-                    <div class="character-empty-content">
-                        <div class="plus-icon">+</div>
-                        <p class="create-text" data-i18n="create_new">Új Karakter</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer-actions">
-                <button class="btn btn-primary" id="play-btn" disabled>
-                    <span data-i18n="play">Játék</span>
-                </button>
-                <button class="btn btn-danger" id="delete-btn" disabled>
-                    <span data-i18n="delete">Törlés</span>
-                </button>
+            <div id="characters-grid" class="characters-grid">
+                <!-- Characters will be generated here by JS -->
             </div>
         </div>
-        
-        <!-- Character Creator Screen -->
-        <div id="character-creator" class="screen hidden">
-            <div class="creator-header">
-                <h2 class="title" data-i18n="create_character">Karakter Létrehozása</h2>
-                <button class="btn-close" id="creator-close">&times;</button>
-            </div>
-            
-            <div class="creator-content">
-                <!-- Step 1: Basic Info -->
-                <div class="creator-step active" id="step-basic">
-                    <h3 class="step-title" data-i18n="character_info">Karakter Információ</h3>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label data-i18n="first_name">Keresztnév</label>
-                            <input type="text" id="firstname" class="form-input" placeholder="John" maxlength="20">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="last_name">Vezetéknév</label>
-                            <input type="text" id="lastname" class="form-input" placeholder="Doe" maxlength="20">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="date_of_birth">Születési Dátum</label>
-                            <input type="date" id="dateofbirth" class="form-input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="height">Magasság (cm)</label>
-                            <input type="number" id="height" class="form-input" value="175" min="150" max="220">
+
+        <!-- Character Creator (Basic - Before Spawn) -->
+        <div id="character-creator" class="hidden">
+            <div class="creator-form-container">
+                <div class="form-header">
+                    <h1 class="form-title">CREATE CHARACTER</h1>
+                    <p class="form-subtitle">Basic Information</p>
+                </div>
+
+                <form id="character-creator-form" class="creator-form">
+                    <div class="form-group">
+                        <label for="firstname">First Name</label>
+                        <input type="text" id="firstname" name="firstname" required 
+                               placeholder="Enter first name" minlength="3" maxlength="20">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastname">Last Name</label>
+                        <input type="text" id="lastname" name="lastname" required 
+                               placeholder="Enter last name" minlength="3" maxlength="20">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateofbirth">Date of Birth</label>
+                        <input type="date" id="dateofbirth" name="dateofbirth" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="m" checked>
+                                <span>Male</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="f">
+                                <span>Female</span>
+                            </label>
                         </div>
                     </div>
-                    
-                    <div class="form-group gender-group">
-                        <label data-i18n="gender">Nem</label>
-                        <div class="gender-buttons">
-                            <button class="gender-btn active" data-gender="m">
-                                <span data-i18n="male">Férfi</span>
+
+                    <div class="form-group">
+                        <label for="height">Height: <span id="height-value">175 cm</span></label>
+                        <input type="range" id="height" name="height" 
+                               min="150" max="220" value="175">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="back-to-selection-btn">
+                            Back
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Continue
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Spawn Selector -->
+        <div id="spawn-selector" class="hidden">
+            <div class="spawn-header">
+                <h1 class="spawn-title">SELECT SPAWN LOCATION</h1>
+                <p class="spawn-subtitle">Choose where your journey begins</p>
+            </div>
+            
+            <div id="spawn-grid" class="spawn-grid">
+                <!-- Spawn locations will be generated here -->
+            </div>
+        </div>
+
+        <!-- Character Creator Advanced (Post-Spawn) -->
+        <div id="character-creator-advanced" class="hidden">
+            <div class="creator-container">
+                <!-- Header -->
+                <div class="creator-header">
+                    <h1 class="creator-title">CHARACTER CUSTOMIZATION</h1>
+                    <p class="creator-subtitle">Customize your survivor's appearance</p>
+                </div>
+
+                <!-- Main Content -->
+                <div class="creator-main">
+                    <!-- Sidebar (Categories) -->
+                    <div class="creator-sidebar">
+                        <div class="creator-tabs">
+                            <button class="creator-tab active" data-tab="heritage">
+                                <span class="tab-icon">🧬</span>
+                                <span class="tab-label">Heritage</span>
                             </button>
-                            <button class="gender-btn" data-gender="f">
-                                <span data-i18n="female">Nő</span>
+                            <button class="creator-tab" data-tab="face">
+                                <span class="tab-icon">👤</span>
+                                <span class="tab-label">Face</span>
                             </button>
+                            <button class="creator-tab" data-tab="hair">
+                                <span class="tab-icon">💇</span>
+                                <span class="tab-label">Hair</span>
+                            </button>
+                            <button class="creator-tab" data-tab="features">
+                                <span class="tab-icon">✨</span>
+                                <span class="tab-label">Features</span>
+                            </button>
+                        </div>
+
+                        <!-- Camera Controls -->
+                        <div class="creator-camera-controls">
+                            <p class="camera-label">CAMERA</p>
+                            <div class="camera-buttons">
+                                <button class="creator-camera-btn" data-camera="head">👤</button>
+                                <button class="creator-camera-btn active" data-camera="body">🧍</button>
+                                <button class="creator-camera-btn" data-camera="legs">🦵</button>
+                                <button class="creator-camera-btn" data-camera="full">🔄</button>
+                            </div>
+                            <p class="camera-hint">🖱️ Drag to rotate</p>
+                        </div>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div class="creator-content-area">
+                        <!-- Heritage Tab -->
+                        <div class="creator-content active" id="creator-heritage">
+                            <h2 class="content-title">GENETIC HERITAGE</h2>
+                            
+                            <div class="creator-grid">
+                                <div class="creator-slider-group">
+                                    <label class="creator-label">Mother</label>
+                                    <div class="slider-with-value">
+                                        <input type="range" class="creator-slider" id="heritage-mom" min="0" max="20" value="0">
+                                        <span class="slider-value" id="heritage-mom-value">0</span>
+                                    </div>
+                                </div>
+
+                                <div class="creator-slider-group">
+                                    <label class="creator-label">Father</label>
+                                    <div class="slider-with-value">
+                                        <input type="range" class="creator-slider" id="heritage-dad" min="0" max="22" value="0">
+                                        <span class="slider-value" id="heritage-dad-value">0</span>
+                                    </div>
+                                </div>
+
+                                <div class="creator-slider-group">
+                                    <label class="creator-label">Similarity</label>
+                                    <div class="slider-with-value">
+                                        <input type="range" class="creator-slider" id="heritage-similarity" min="0" max="100" value="50">
+                                        <span class="slider-value" id="heritage-similarity-value">50%</span>
+                                    </div>
+                                </div>
+
+                                <div class="creator-slider-group">
+                                    <label class="creator-label">Skin Tone</label>
+                                    <div class="slider-with-value">
+                                        <input type="range" class="creator-slider" id="heritage-skin-similarity" min="0" max="100" value="50">
+                                        <span class="slider-value" id="heritage-skin-value">50%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Face Features Tab -->
+                        <div class="creator-content" id="creator-face">
+                            <h2 class="content-title">FACIAL FEATURES</h2>
+                            <div class="creator-grid" id="face-features-container">
+                                <!-- Generated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Hair Tab -->
+                        <div class="creator-content" id="creator-hair">
+                            <h2 class="content-title">HAIR STYLE</h2>
+                            
+                            <div class="creator-grid">
+                                <div class="creator-slider-group">
+                                    <label class="creator-label">Hair Style</label>
+                                    <div class="slider-with-value">
+                                        <input type="range" class="creator-slider" id="hair-style" min="0" max="30" value="0">
+                                        <span class="slider-value" id="hair-style-value">0</span>
+                                    </div>
+                                </div>
+
+                                <div class="creator-slider-group">
+                                    <label class="creator-label">Hair Color</label>
+                                    <div class="slider-with-value">
+                                        <input type="range" class="creator-slider" id="hair-color" min="0" max="63" value="0">
+                                        <span class="slider-value" id="hair-color-value">0</span>
+                                    </div>
+                                </div>
+
+                                <div class="creator-slider-group">
+                                    <label class="creator-label">Highlight Color</label>
+                                    <div class="slider-with-value">
+                                        <input type="range" class="creator-slider" id="hair-highlight" min="0" max="63" value="0">
+                                        <span class="slider-value" id="hair-highlight-value">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Features Tab -->
+                        <div class="creator-content" id="creator-features">
+                            <h2 class="content-title">FACIAL FEATURES</h2>
+                            
+                            <div class="creator-grid">
+                                <!-- Eyebrows -->
+                                <div class="feature-section">
+                                    <h3 class="feature-title">Eyebrows</h3>
+                                    <div class="creator-slider-group">
+                                        <label class="creator-label">Style</label>
+                                        <div class="slider-with-value">
+                                            <input type="range" class="creator-slider" id="eyebrows-style" min="-1" max="33" value="0">
+                                            <span class="slider-value" id="eyebrows-style-value">0</span>
+                                        </div>
+                                    </div>
+                                    <div class="creator-slider-group">
+                                        <label class="creator-label">Color</label>
+                                        <div class="slider-with-value">
+                                            <input type="range" class="creator-slider" id="eyebrows-color" min="0" max="63" value="0">
+                                            <span class="slider-value" id="eyebrows-color-value">0</span>
+                                        </div>
+                                    </div>
+                                    <div class="creator-slider-group">
+                                        <label class="creator-label">Opacity</label>
+                                        <div class="slider-with-value">
+                                            <input type="range" class="creator-slider" id="eyebrows-opacity" min="0" max="100" value="100">
+                                            <span class="slider-value" id="eyebrows-opacity-value">100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Beard -->
+                                <div class="feature-section" id="beard-section">
+                                    <h3 class="feature-title">Beard</h3>
+                                    <div class="creator-slider-group">
+                                        <label class="creator-label">Style</label>
+                                        <div class="slider-with-value">
+                                            <input type="range" class="creator-slider" id="beard-style" min="-1" max="28" value="-1">
+                                            <span class="slider-value" id="beard-style-value">None</span>
+                                        </div>
+                                    </div>
+                                    <div class="creator-slider-group">
+                                        <label class="creator-label">Color</label>
+                                        <div class="slider-with-value">
+                                            <input type="range" class="creator-slider" id="beard-color" min="0" max="63" value="0">
+                                            <span class="slider-value" id="beard-color-value">0</span>
+                                        </div>
+                                    </div>
+                                    <div class="creator-slider-group">
+                                        <label class="creator-label">Opacity</label>
+                                        <div class="slider-with-value">
+                                            <input type="range" class="creator-slider" id="beard-opacity" min="0" max="100" value="100">
+                                            <span class="slider-value" id="beard-opacity-value">100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Eye Color -->
+                                <div class="feature-section">
+                                    <h3 class="feature-title">Eye Color</h3>
+                                    <div class="creator-slider-group">
+                                        <label class="creator-label">Color</label>
+                                        <div class="slider-with-value">
+                                            <input type="range" class="creator-slider" id="eye-color" min="0" max="31" value="0">
+                                            <span class="slider-value" id="eye-color-value">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Step 2: Spawn Selection -->
-                <div class="creator-step" id="step-spawn">
-                    <h3 class="step-title" data-i18n="select_spawn">Válassz Spawn Pontot</h3>
-                    
-                    <div class="spawn-grid" id="spawn-grid">
-                        <!-- Spawn locations will be inserted here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="creator-footer">
-                <button class="btn btn-secondary" id="creator-back" data-i18n="back">Vissza</button>
-                <button class="btn btn-primary" id="creator-next" data-i18n="next">Következő</button>
-                <button class="btn btn-success hidden" id="creator-finish" data-i18n="finish">Befejezés</button>
-            </div>
-        </div>
-        
-        <!-- Delete Confirmation Modal -->
-        <div id="delete-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3 class="modal-title" data-i18n="confirm">Megerősítés</h3>
-                <p class="modal-text" id="delete-text"></p>
-                <div class="modal-actions">
-                    <button class="btn btn-secondary" id="cancel-delete" data-i18n="cancel">Mégse</button>
-                    <button class="btn btn-danger" id="confirm-delete" data-i18n="delete">Törlés</button>
+
+                <!-- Footer -->
+                <div class="creator-footer">
+                    <button class="btn btn-secondary" id="reset-creator-btn">Reset</button>
+                    <button class="btn btn-danger" id="cancel-creator-btn">Cancel</button>
+                    <button class="btn btn-primary" id="finish-creator-btn">Finish</button>
                 </div>
             </div>
         </div>
-        
-        <div id="step-appearance" class="creator-step">
-             <h3 class="creator-step-title">MEGJELENÉS</h3>
-    
-             <div class="appearance-section">
-                <h4 class="appearance-section-title">Öröklődés</h4>
-        
-                <div class="slider-group">
-                    <label>Anya</label>
-                    <div class="slider-container">
-                        <input type="range" id="heritage-mother" min="0" max="20" value="0" class="slider">
-                        <span id="mother-value" class="slider-value">0</span>
-                    </div>
-                </div>
-        
-                <div class="slider-group">
-                    <label>Apa</label>
-                    <div class="slider-container">
-                        <input type="range" id="heritage-father" min="0" max="22" value="0" class="slider">
-                        <span id="father-value" class="slider-value">0</span>
-                    </div>
-                </div>
-        
-                <div class="slider-group">
-                    <label>Hasonlóság</label>
-                    <div class="slider-container">
-                        <input type="range" id="heritage-similarity" min="0" max="100" value="50" class="slider">
-                        <span id="similarity-value" class="slider-value">50%</span>
-                    </div>
-                </div>
-        
-                <div class="slider-group">
-                    <label>Bőrszín hasonlóság</label>
-                    <div class="slider-container">
-                        <input type="range" id="heritage-skin" min="0" max="100" value="50" class="slider">
-                        <span id="skin-value" class="slider-value">50%</span>
-                    </div>
-                </div>
-            </div>
-    
-                <div class="appearance-hint">
-                    <p>💡 Ezek az alapbeállítások. A teljes testreszabást a játékban végezheted el később.</p>
-                </div>
-            </div>
-        
-        </div>
+
     </div>
 
     <script src="script.js"></script>

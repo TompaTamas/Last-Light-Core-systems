@@ -586,3 +586,497 @@ body {
     z-index: -1;
 }
 
+/* ======================================
+   HOZZÁADANDÓ CSS RÉSZLETEK
+   ====================================== */
+
+/* Character Selection Cards */
+.character-card {
+    background: rgba(26, 26, 26, 0.95);
+    border: 2px solid rgba(132, 204, 22, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.character-card:hover {
+    border-color: rgba(132, 204, 22, 0.6);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(132, 204, 22, 0.2);
+}
+
+.new-character-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    background: rgba(26, 26, 26, 0.8);
+    border: 3px dashed rgba(132, 204, 22, 0.3);
+    cursor: pointer;
+}
+
+.new-character-card:hover {
+    border-color: rgba(132, 204, 22, 0.8);
+    background: rgba(132, 204, 22, 0.1);
+}
+
+.new-character-content {
+    text-align: center;
+}
+
+.new-character-icon {
+    font-size: 72px;
+    margin-bottom: 20px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.new-character-card:hover .new-character-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.new-character-content h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #84cc16;
+    margin: 0;
+}
+
+/* Character Grid */
+.characters-grid,
+#characters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 20px;
+}
+
+/* Character Info */
+.character-preview {
+    width: 100%;
+    height: 200px;
+    background: rgba(42, 42, 42, 0.5);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.character-model {
+    font-size: 64px;
+}
+
+.character-icon {
+    font-size: 80px;
+    opacity: 0.8;
+}
+
+.character-info {
+    margin-bottom: 16px;
+}
+
+.character-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #84cc16;
+    margin: 0 0 12px 0;
+}
+
+.character-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.detail-item {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.character-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(132, 204, 22, 0.2);
+}
+
+.stat-item {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.character-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #84cc16;
+    color: #0a0a0a;
+}
+
+.btn-primary:hover {
+    background: #65a30d;
+    box-shadow: 0 4px 15px rgba(132, 204, 22, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(42, 42, 42, 0.8);
+    color: #e5e5e5;
+}
+
+.btn-secondary:hover {
+    background: rgba(58, 58, 58, 0.9);
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.character-play-btn {
+    flex: 1;
+}
+
+.character-delete-btn {
+    flex: 0;
+    padding: 12px 20px;
+}
+
+/* Hidden utility */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .characters-grid,
+    #characters-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ======================================
+   SPAWN SELECTOR
+   ====================================== */
+
+#spawn-selector {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.95);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.spawn-header {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.spawn-title {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--primary, #84cc16);
+    margin: 0 0 16px 0;
+    text-shadow: 0 0 20px rgba(132, 204, 22, 0.5);
+}
+
+.spawn-subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 2px;
+}
+
+.spawn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.spawn-card {
+    background: rgba(26, 26, 26, 0.9);
+    border: 3px solid rgba(132, 204, 22, 0.3);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.spawn-card:hover {
+    border-color: rgba(132, 204, 22, 0.8);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(132, 204, 22, 0.3);
+}
+
+.spawn-card.selected {
+    border-color: #84cc16;
+    background: rgba(132, 204, 22, 0.1);
+    box-shadow: 0 0 30px rgba(132, 204, 22, 0.6);
+}
+
+.spawn-image {
+    width: 100%;
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.spawn-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.9), transparent);
+}
+
+.spawn-info {
+    padding: 24px;
+    position: relative;
+}
+
+.spawn-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: #84cc16;
+    margin: 0;
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.spawn-card.selected .spawn-name::after {
+    content: ' ✓';
+    color: #84cc16;
+}
+
+@media (max-width: 768px) {
+    .spawn-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .spawn-title {
+        font-size: 32px;
+    }
+}
+
+/* ======================================
+   CHARACTER CREATOR FORM (Basic)
+   ====================================== */
+
+#character-creator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.creator-form-container {
+    background: rgba(26, 26, 26, 0.95);
+    border: 2px solid rgba(132, 204, 22, 0.3);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.form-title {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #84cc16;
+    margin: 0 0 12px 0;
+    text-shadow: 0 0 20px rgba(132, 204, 22, 0.5);
+}
+
+.form-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 2px;
+}
+
+.creator-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="range"] {
+    padding: 14px 16px;
+    background: rgba(42, 42, 42, 0.8);
+    border: 2px solid rgba(132, 204, 22, 0.2);
+    border-radius: 8px;
+    color: #e5e5e5;
+    font-size: 16px;
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="date"]:focus {
+    outline: none;
+    border-color: #84cc16;
+    box-shadow: 0 0 15px rgba(132, 204, 22, 0.3);
+}
+
+.form-group input[type="range"] {
+    height: 6px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.form-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #84cc16;
+    border: 3px solid #0a0a0a;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: rgba(42, 42, 42, 0.8);
+    border: 2px solid rgba(132, 204, 22, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    justify-content: center;
+}
+
+.radio-label:hover {
+    border-color: rgba(132, 204, 22, 0.6);
+}
+
+.radio-label input[type="radio"] {
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"]:checked ~ span {
+    color: #84cc16;
+    font-weight: 700;
+}
+
+.radio-label:has(input[type="radio"]:checked) {
+    border-color: #84cc16;
+    background: rgba(132, 204, 22, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    flex: 1;
+}
+
+/* Character Selection Header */
+#character-selection {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.95);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.selection-header {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.selection-title {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: #84cc16;
+    margin: 0 0 16px 0;
+    text-shadow: 0 0 20px rgba(132, 204, 22, 0.5);
+}
+
+.selection-subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 2px;
+}

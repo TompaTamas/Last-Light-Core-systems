@@ -37,11 +37,6 @@ RegisterNetEvent('ll-account:client:showRegistration', function()
     
     Citizen.SetTimeout(500, function()
         Account.OpenCharacterCreator()
-        
-        -- Creator ped létrehozása
-        Citizen.SetTimeout(1000, function()
-            Account.CreateCreatorPed('m')
-        end)
     end)
 end)
 
@@ -63,7 +58,7 @@ RegisterNUICallback('selectCharacter', function(data, cb)
     cb('ok')
 end)
 
--- Karakter létrehozása
+-- Karakter létrehozása (alapadatok)
 RegisterNUICallback('createCharacter', function(data, cb)
     Account.Debug('Creating character: ' .. data.firstname .. ' ' .. data.lastname)
     
@@ -92,13 +87,64 @@ RegisterNUICallback('createCharacter', function(data, cb)
         return
     end
     
-    -- Szerver validáció és létrehozás
-    TriggerServerEvent('ll-account:server:createCharacter', data)
+    -- Karakter adatok tárolása
+    Account.PendingCharacter = {
+        firstname = data.firstname,
+        lastname = data.lastname,
+        dateofbirth = data.dateofbirth,
+        gender = data.gender,
+        height = data.height,
+        is_new = true
+    }
+    
+    -- Spawn választó megnyitása
+    Account.OpenSpawnSelector(Account.PendingCharacter)
     
     cb({success = true})
 end)
 
--- Karakter törölése
+-- Creator befejezése (skin data-val)
+RegisterNUICallback('finishCreator', function(data, cb)
+    Account.Debug('Creator finished, creating character on server')
+    
+    if not Account.PendingCharacter then
+        cb({success = false, error = 'No pending character data'})
+        return
+    end
+    
+    -- Skin data hozzáadása
+    Account.PendingCharacter.skin = data.skinData
+    
+    -- Szerver validáció és létrehozás
+    TriggerServerEvent('ll-account:server:createCharacter', Account.PendingCharacter)
+    
+    cb({success = true})
+end)
+
+-- Karakter létrehozás sikeres (szerverről jön)
+RegisterNetEvent('ll-account:client:characterCreated', function(charid)
+    Account.Debug('Character created successfully with ID: ' .. charid)
+    
+    if not Account.PendingCharacter then
+        Account.Debug('ERROR: No pending character data!')
+        return
+    end
+    
+    -- Karakter ID hozzáadása
+    Account.PendingCharacter.id = charid
+    
+    -- Spawn a kiválasztott helyszínen
+    if Account.SelectedSpawn then
+        Account.SpawnCharacterAtLocation(Account.PendingCharacter, Account.SelectedSpawn, Account.PendingCharacter.skin)
+    else
+        Account.Debug('ERROR: No spawn location selected!')
+    end
+    
+    -- Cleanup
+    Account.PendingCharacter = nil
+end)
+
+-- Karakter törlése
 RegisterNUICallback('deleteCharacter', function(data, cb)
     Account.Debug('Deleting character: ' .. data.charid)
     
@@ -118,29 +164,19 @@ RegisterNetEvent('ll-account:client:characterDeleted', function()
     TriggerServerEvent('ll-account:server:getCharacters')
 end)
 
--- Karakter létrehozás sikeres
-RegisterNetEvent('ll-account:client:characterCreated', function(charid)
-    Account.Debug('Character created successfully: ' .. charid)
-    
-    Account.Notify(_('character_created'), 'success')
-    
-    -- UI bezárása
-    Account.ShowUI(false)
-    
-    -- Fade
-    Account.FadeScreen(true, 1000)
-    
-    -- Karakter betöltése
-    TriggerServerEvent('ll-account:server:selectCharacter', charid)
-end)
-
 -- Karakter betöltés hiba
 RegisterNetEvent('ll-account:client:error', function(message)
     Account.Notify(message, 'error', 7000)
 end)
 
--- NUI bezárás
+-- NUI bezárás (ESC - tiltva character selection alatt)
 RegisterNUICallback('close', function(data, cb)
+    -- Ne engedjük bezárni karakterválasztás alatt
+    if Account.IsInCharacterSelection then
+        cb('denied')
+        return
+    end
+    
     Account.ShowUI(false)
     Account.DestroyCamera()
     cb('ok')
@@ -161,16 +197,20 @@ Citizen.CreateThread(function()
 end)
 
 -- Discord Rich Presence
-if Config.DiscordRichPresence.Enable then
+if Config.DiscordRichPresence and Config.DiscordRichPresence.Enable then
     Citizen.CreateThread(function()
-        while Account.IsInCharacterSelection do
+        while true do
             Citizen.Wait(1000)
             
-            SetDiscordAppId(Config.DiscordRichPresence.ApplicationId)
-            SetDiscordRichPresenceAsset(Config.DiscordRichPresence.LargeImage)
-            SetDiscordRichPresenceAssetText(Config.DiscordRichPresence.LargeText)
-            SetDiscordRichPresenceAssetSmall(Config.DiscordRichPresence.SmallImage)
-            SetDiscordRichPresenceAssetSmallText(Config.DiscordRichPresence.SmallText)
+            if Account.IsInCharacterSelection then
+                SetDiscordAppId(Config.DiscordRichPresence.ApplicationId)
+                SetDiscordRichPresenceAsset(Config.DiscordRichPresence.LargeImage)
+                SetDiscordRichPresenceAssetText(Config.DiscordRichPresence.LargeText)
+                SetDiscordRichPresenceAssetSmall(Config.DiscordRichPresence.SmallImage)
+                SetDiscordRichPresenceAssetSmallText(Config.DiscordRichPresence.SmallText)
+            else
+                Citizen.Wait(5000)
+            end
         end
     end)
 end

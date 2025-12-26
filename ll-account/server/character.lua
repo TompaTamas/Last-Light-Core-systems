@@ -63,20 +63,12 @@ RegisterNetEvent('ll-account:server:createCharacter', function(data)
             {name = 'bank', money = Config.StartingKit.Money.bank or 0}
         })
         
-        -- Alap skin
-        local defaultSkin = data.skin or json.encode({
-            model = data.gender == 'm' and 'mp_m_freemode_01' or 'mp_f_freemode_01',
-            heritage = {
-                mom = 0,
-                dad = 0,
-                similarity = 0.5,
-                skin_similarity = 0.5
-            },
-            components = {},
-            props = {}
+        -- ÜRES skin (később ll-skin-ből frissül)
+        local defaultSkin = json.encode({
+            model = data.gender == 'm' and 'mp_m_freemode_01' or 'mp_f_freemode_01'
         })
         
-        -- Karakter létrehozása
+        -- Karakter létrehozása (skin nélkül)
         MySQL.Async.insert([[
             INSERT INTO characters (identifier, firstname, lastname, dateofbirth, sex, height, accounts, skin, position)
             VALUES (@identifier, @firstname, @lastname, @dateofbirth, @sex, @height, @accounts, @skin, @position)
@@ -120,6 +112,43 @@ RegisterNetEvent('ll-account:server:createCharacter', function(data)
                 TriggerClientEvent('ll-account:client:characterCreated', source, charid)
             else
                 TriggerClientEvent('ll-account:client:error', source, _('error_creating'))
+            end
+        end)
+    end)
+end)
+
+-- Karakter finalizálása (skin mentése ll-skin után)
+RegisterNetEvent('ll-account:server:finalizeCharacter', function(charid, skinData)
+    local source = source
+    local identifier = Account.GetIdentifier(source)
+    
+    if not identifier or not charid or not skinData then
+        Account.Debug('ERROR: Missing data for finalize - identifier: ' .. tostring(identifier) .. ' charid: ' .. tostring(charid))
+        return
+    end
+    
+    -- Ellenőrzés: a karakter a játékosé-e
+    MySQL.Async.fetchAll('SELECT * FROM characters WHERE id = @charid AND identifier = @identifier', {
+        ['@charid'] = charid,
+        ['@identifier'] = identifier
+    }, function(result)
+        if not result[1] then
+            Account.Debug('ERROR: Character not found or not owned by player')
+            return
+        end
+        
+        -- Skin mentése
+        MySQL.Async.execute('UPDATE characters SET skin = @skin WHERE id = @charid', {
+            ['@skin'] = skinData,
+            ['@charid'] = charid
+        }, function(affectedRows)
+            if affectedRows > 0 then
+                Account.Debug('Character finalized: skin saved for charid ' .. charid)
+                
+                -- ll-core-nak karaktert betöltjük
+                TriggerEvent('ll-core:server:loadCharacter', source, charid)
+            else
+                Account.Debug('ERROR: Failed to save skin for charid ' .. charid)
             end
         end)
     end)
@@ -205,4 +234,14 @@ RegisterNetEvent('ll-account:server:updateCharacter', function(charid, data)
         
         Account.Debug('Character updated: ' .. charid)
     end)
+end)
+
+-- Karakter spawned event
+RegisterNetEvent('ll-account:server:characterSpawned', function(charid)
+    local source = source
+    
+    Account.Debug('Character spawned event received for charid: ' .. charid)
+    
+    -- ll-core-nak karakter betöltés trigger
+    TriggerEvent('ll-core:server:loadCharacter', source, charid)
 end)

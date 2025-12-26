@@ -1,59 +1,248 @@
--- Spawn kiválasztás és kezelés
+-- Spawn választás és kezelés (V2 - Creator SPAWN UTÁN)
 
--- Spawn választó megnyitása
-RegisterNUICallback('selectSpawn', function(data, cb)
-    Account.Debug('Spawn selection opened')
+-- Spawn választó megnyitása (karakter létrehozás után)
+function Account.OpenSpawnSelector(characterData)
+    Account.Debug('Opening spawn selector')
     
-    -- Config küldése
+    -- Karakteradatok tárolása
+    Account.PendingCharacter = characterData
+    
+    -- NUI-nak spawn lista küldése
     SendNUIMessage({
         action = 'showSpawnSelector',
-        spawns = Config.Spawn.NewCharacterSpawns
+        spawns = Config.Spawn.NewCharacterSpawns,
+        character = {
+            firstname = characterData.firstname,
+            lastname = characterData.lastname,
+            gender = characterData.gender
+        }
     })
-    
-    cb('ok')
-end)
+end
 
--- Spawn megerősítése
+-- Spawn megerősítése (NUI callback)
 RegisterNUICallback('confirmSpawn', function(data, cb)
-    Account.Debug('Spawn confirmed: ' .. tostring(data.spawnIndex))
-    
     local spawnIndex = tonumber(data.spawnIndex)
+    
     if not spawnIndex then
+        Account.Debug('ERROR: Invalid spawn index: ' .. tostring(data.spawnIndex))
         cb({success = false, error = 'Invalid spawn index'})
         return
     end
     
-    -- +1 mert JS 0-based index
-    local actualIndex = spawnIndex + 1
-    local spawnData = Config.Spawn.NewCharacterSpawns[actualIndex]
+    -- FONTOS: JavaScript 0-based, Lua 1-based
+    local luaIndex = spawnIndex + 1
+    
+    Account.Debug('Spawn selected - JS index: ' .. spawnIndex .. ' | Lua index: ' .. luaIndex)
+    
+    local spawnData = Config.Spawn.NewCharacterSpawns[luaIndex]
     
     if not spawnData then
-        Account.Debug('Spawn not found at index: ' .. actualIndex)
+        Account.Debug('ERROR: Spawn not found at Lua index: ' .. luaIndex)
+        Account.Debug('Available spawns: ' .. #Config.Spawn.NewCharacterSpawns)
         cb({success = false, error = 'Invalid spawn location'})
         return
     end
     
-    -- Spawn koordináták tárolása karakterhez
+    Account.Debug('Spawn confirmed: ' .. spawnData.label)
+    Account.Debug('Coords: ' .. spawnData.coords.x .. ', ' .. spawnData.coords.y .. ', ' .. spawnData.coords.z .. ', ' .. spawnData.coords.w)
+    
+    -- Spawn koordináták tárolása
     Account.SelectedSpawn = spawnData.coords
     
-    Account.Debug('Spawn selected: ' .. spawnData.label .. ' at ' .. tostring(spawnData.coords))
+    -- NUI bezárása
+    SetNuiFocus(false, false)
+    SendNUIMessage({
+        action = 'hideUI'
+    })
+    
+    -- Fade out
+    DoScreenFadeOut(500)
+    while not IsScreenFadedOut() do
+        Citizen.Wait(10)
+    end
+    
+    Citizen.Wait(500)
+    
+    -- Először spawn-oljuk a karaktert az alap skin-nel
+    -- UTÁNA nyitjuk meg a character creator-t
+    Account.SpawnNewCharacter(Account.PendingCharacter, Account.SelectedSpawn)
     
     cb({success = true})
 end)
 
--- Karakter spawn (betöltés után)
-RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
-    Account.Debug('Spawning character: ' .. characterData.firstname)
+-- Új karakter spawn (alap skin, MAJD creator)
+function Account.SpawnNewCharacter(characterData, spawnCoords)
+    Account.Debug('Spawning new character at location')
     
-    -- NUI fade out animáció
+    -- Model beállítás
+    local model = characterData.gender == 'm' and GetHashKey('mp_m_freemode_01') or GetHashKey('mp_f_freemode_01')
+    
+    RequestModel(model)
+    while not HasModelLoaded(model) do
+        Citizen.Wait(10)
+    end
+    
+    SetPlayerModel(PlayerId(), model)
+    SetModelAsNoLongerNeeded(model)
+    
+    Citizen.Wait(500)
+    
+    local playerPed = PlayerPedId()
+    
+    -- Collision betöltése
+    RequestCollisionAtCoord(spawnCoords.x, spawnCoords.y, spawnCoords.z)
+    
+    -- Teleport
+    SetEntityCoordsNoOffset(playerPed, spawnCoords.x, spawnCoords.y, spawnCoords.z, false, false, false)
+    SetEntityHeading(playerPed, spawnCoords.w or 0.0)
+    
+    -- Collision várakozás
+    local timeout = 0
+    while not HasCollisionLoadedAroundEntity(playerPed) and timeout < 3000 do
+        Citizen.Wait(10)
+        timeout = timeout + 10
+        RequestCollisionAtCoord(spawnCoords.x, spawnCoords.y, spawnCoords.z)
+    end
+    
+    -- Alap ruhák
+    local clothes = characterData.gender == 'm' and Config.Creator.DefaultClothes.Male or Config.Creator.DefaultClothes.Female
+    
+    SetPedComponentVariation(playerPed, 3, 15, 0, 0)
+    SetPedComponentVariation(playerPed, 8, clothes.tshirt[1], clothes.tshirt[2], 0)
+    SetPedComponentVariation(playerPed, 11, clothes.torso[1], clothes.torso[2], 0)
+    SetPedComponentVariation(playerPed, 4, clothes.legs[1], clothes.legs[2], 0)
+    SetPedComponentVariation(playerPed, 6, clothes.shoes[1], clothes.shoes[2], 0)
+    
+    -- Alapértelmezett heritage
+    SetPedHeadBlendData(playerPed, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.0, false)
+    
+    Citizen.Wait(300)
+    
+    -- Láthatóság FIX
+    SetEntityVisible(playerPed, true, false)
+    SetEntityAlpha(playerPed, 255, false)
+    ResetEntityAlpha(playerPed)
+    
+    -- Entity beállítások
+    SetEntityAsMissionEntity(playerPed, true, true)
+    SetPedCanRagdoll(playerPed, true)
+    SetEntityCollision(playerPed, true, true)
+    
+    -- Network
+    NetworkSetEntityInvisibleToNetwork(playerPed, false)
+    SetNetworkIdExistsOnAllMachines(NetworkGetNetworkIdFromEntity(playerPed), true)
+    
+    -- HUD
+    DisplayHud(true)
+    DisplayRadar(true)
+    
+    -- State
+    Account.IsLoggedIn = true
+    Account.IsInCharacterSelection = false
+    Account.CurrentCharacter = characterData
+    
+    -- Player UNFREEZE
+    FreezeEntityPosition(playerPed, false)
+    SetPlayerInvincible(PlayerId(), false)
+    
+    Citizen.Wait(500)
+    
+    -- Fade in
+    DoScreenFadeIn(1000)
+    while not IsScreenFadedIn() do
+        Citizen.Wait(10)
+    end
+    
+    -- Notify
+    Account.Notify(_('character_loaded', characterData.firstname .. ' ' .. characterData.lastname), 'success', 5000)
+    
+    Account.Debug('Character spawned, opening ll-skin for customization')
+    
+    -- Most nyitjuk meg az ll-skin-t hogy szerkeszthesse a megjelenését
+    Citizen.Wait(1000)
+    
+    if GetResourceState('ll-skin') == 'started' then
+        -- ll-skin megnyitása
+        exports['ll-skin']:OpenMenu()
+        Account.Debug('ll-skin menu opened for new character')
+    else
+        Account.Debug('WARNING: ll-skin not started!')
+        Account.Notify('You can customize your appearance later at a clothing shop', 'info', 5000)
+        
+        -- Karakter mentése alap skin-nel
+        Account.FinalizeNewCharacter()
+    end
+end
+
+-- ll-skin bezárás után finalizáljuk a karaktert
+RegisterNetEvent('ll-skin:client:menuClosed', function(saved)
+    if Account.CurrentCharacter and Account.CurrentCharacter.is_new then
+        Account.Debug('ll-skin closed, finalizing character')
+        Account.FinalizeNewCharacter()
+    end
+end)
+
+-- Új karakter finalizálása (skin mentés után)
+function Account.FinalizeNewCharacter()
+    if not Account.CurrentCharacter or not Account.CurrentCharacter.is_new then
+        return
+    end
+    
+    Account.Debug('Finalizing new character')
+    
+    -- Jelenlegi skin lekérése
+    local currentSkin = {}
+    
+    if GetResourceState('ll-skin') == 'started' then
+        currentSkin = exports['ll-skin']:GetCurrentSkin()
+    else
+        -- Alap skin
+        currentSkin = {
+            model = Account.CurrentCharacter.gender == 'm' and 'mp_m_freemode_01' or 'mp_f_freemode_01',
+            heritage = {mom = 0, dad = 0, similarity = 0.5, skin_similarity = 0.5},
+            components = {},
+            props = {}
+        }
+    end
+    
+    local skinJson = json.encode(currentSkin)
+    
+    -- Szervernek küldés véglegesítéshez
+    TriggerServerEvent('ll-account:server:finalizeCharacter', Account.CurrentCharacter.id, skinJson)
+    
+    -- is_new flag törlése
+    Account.CurrentCharacter.is_new = false
+    
+    -- Kezdő csomag
+    Citizen.Wait(1000)
+    Account.GiveStartingKit()
+    
+    -- Tutorial
+    if Config.Tutorial and Config.Tutorial.Enable and Config.Tutorial.ShowForNewPlayers then
+        Citizen.SetTimeout(3000, function()
+            Account.ShowTutorial()
+        end)
+    end
+    
+    -- Events
+    TriggerEvent('ll-core:client:characterLoaded', Account.CurrentCharacter)
+    TriggerServerEvent('ll-account:server:characterSpawned', Account.CurrentCharacter.id)
+    
+    Account.Debug('New character finalized successfully')
+end
+
+-- Karakter spawn (meglévő karakter betöltése)
+RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
+    Account.Debug('Spawning existing character: ' .. characterData.firstname)
+    
+    -- NUI fade out
     SendNUIMessage({
         action = 'fadeOut'
     })
     
-    -- Várunk az animációra
     Citizen.Wait(1000)
     
-    -- MOST bezárjuk az NUI-t
+    -- NUI bezárása
     SetNuiFocus(false, false)
     SendNUIMessage({
         action = 'hideUI'
@@ -65,16 +254,14 @@ RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
         Citizen.Wait(10)
     end
     
-    -- Teljes cleanup
-    RenderScriptCams(false, false, 0, true, true)
-    
-    -- Camera destroy
+    -- Camera cleanup
     if Account.CurrentCamera and DoesCamExist(Account.CurrentCamera) then
+        RenderScriptCams(false, false, 0, true, true)
         DestroyCam(Account.CurrentCamera, false)
         Account.CurrentCamera = nil
     end
     
-    -- Spawn pozíció
+    -- Spawn coords meghatározása
     local spawnCoords
     
     if Config.Spawn.UseLastPosition and characterData.position then
@@ -82,18 +269,18 @@ RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
         local success, pos = pcall(json.decode, characterData.position)
         if success and pos and pos.x and pos.y and pos.z then
             spawnCoords = vector4(tonumber(pos.x), tonumber(pos.y), tonumber(pos.z), tonumber(pos.heading or 0.0))
+            Account.Debug('Using last position: ' .. spawnCoords.x .. ', ' .. spawnCoords.y .. ', ' .. spawnCoords.z)
         else
             spawnCoords = Config.Spawn.DefaultSpawn
+            Account.Debug('Invalid position data, using default spawn')
         end
-    elseif Account.SelectedSpawn then
-        -- Kiválasztott spawn (új karakter)
-        spawnCoords = Account.SelectedSpawn
     else
         -- Alapértelmezett spawn
         spawnCoords = Config.Spawn.DefaultSpawn
+        Account.Debug('Using default spawn')
     end
     
-    -- Model beállítás ELŐSZÖR
+    -- Model beállítás
     local model = characterData.sex == 'm' and GetHashKey(Config.Creator.Gender.Male) or GetHashKey(Config.Creator.Gender.Female)
     
     RequestModel(model)
@@ -104,22 +291,22 @@ RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
     SetPlayerModel(PlayerId(), model)
     SetModelAsNoLongerNeeded(model)
     
-    Citizen.Wait(500) -- Várunk hogy a model teljesen betöltődjön
+    Citizen.Wait(500)
     
     local playerPed = PlayerPedId()
     
-    -- KRITIKUS: Entity beállítások
+    -- Entity setup
     SetEntityAsMissionEntity(playerPed, true, true)
     SetPedCanRagdoll(playerPed, true)
     
-    -- Collision betöltése
+    -- Collision
     RequestCollisionAtCoord(spawnCoords.x, spawnCoords.y, spawnCoords.z)
     
     -- Teleport
     SetEntityCoordsNoOffset(playerPed, spawnCoords.x, spawnCoords.y, spawnCoords.z, false, false, false)
     SetEntityHeading(playerPed, spawnCoords.w or 0.0)
     
-    -- Várunk a collision-re
+    -- Collision várakozás
     local timeout = 0
     while not HasCollisionLoadedAroundEntity(playerPed) and timeout < 3000 do
         Citizen.Wait(10)
@@ -127,29 +314,30 @@ RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
         RequestCollisionAtCoord(spawnCoords.x, spawnCoords.y, spawnCoords.z)
     end
     
-    -- Megjelenés betöltése
+    -- Skin betöltése
     Citizen.Wait(200)
     
     if characterData.skin and characterData.skin ~= '' and characterData.skin ~= '{}' then
         local success, skin = pcall(json.decode, characterData.skin)
         
-        -- ll-skin integration
         if success and skin and GetResourceState('ll-skin') == 'started' then
             Citizen.Wait(200)
             exports['ll-skin']:ApplySkin(skin)
         else
-            -- Alap ruhák átmeneti
+            -- Alap ruhák fallback
             local clothes = characterData.sex == 'm' and Config.Creator.DefaultClothes.Male or Config.Creator.DefaultClothes.Female
             
+            SetPedComponentVariation(playerPed, 3, 15, 0, 0)
             SetPedComponentVariation(playerPed, 8, clothes.tshirt[1], clothes.tshirt[2], 0)
             SetPedComponentVariation(playerPed, 11, clothes.torso[1], clothes.torso[2], 0)
             SetPedComponentVariation(playerPed, 4, clothes.legs[1], clothes.legs[2], 0)
             SetPedComponentVariation(playerPed, 6, clothes.shoes[1], clothes.shoes[2], 0)
         end
     else
-        -- Ha nincs skin, alap ruhák MINDENKÉPP
+        -- Alap ruhák
         local clothes = characterData.sex == 'm' and Config.Creator.DefaultClothes.Male or Config.Creator.DefaultClothes.Female
         
+        SetPedComponentVariation(playerPed, 3, 15, 0, 0)
         SetPedComponentVariation(playerPed, 8, clothes.tshirt[1], clothes.tshirt[2], 0)
         SetPedComponentVariation(playerPed, 11, clothes.torso[1], clothes.torso[2], 0)
         SetPedComponentVariation(playerPed, 4, clothes.legs[1], clothes.legs[2], 0)
@@ -158,13 +346,13 @@ RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
     
     Citizen.Wait(500)
     
-    -- KRITIKUS: Láthatóság FIX (ez oldja meg a problémát!)
+    -- Láthatóság FIX
     SetEntityVisible(playerPed, true, false)
     SetEntityAlpha(playerPed, 255, false)
     ResetEntityAlpha(playerPed)
     SetPedDefaultComponentVariation(playerPed)
     
-    -- Player unfreeze
+    -- Unfreeze
     FreezeEntityPosition(playerPed, false)
     SetPlayerInvincible(PlayerId(), false)
     SetEntityCollision(playerPed, true, true)
@@ -173,11 +361,11 @@ RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
     NetworkSetEntityInvisibleToNetwork(playerPed, false)
     SetNetworkIdExistsOnAllMachines(NetworkGetNetworkIdFromEntity(playerPed), true)
     
-    -- HUD megjelenítése
+    -- HUD
     DisplayHud(true)
     DisplayRadar(true)
     
-    -- Account state
+    -- State
     Account.IsLoggedIn = true
     Account.IsInCharacterSelection = false
     Account.CurrentCharacter = characterData
@@ -193,28 +381,14 @@ RegisterNetEvent('ll-account:client:spawnCharacter', function(characterData)
     -- Notify
     Account.Notify(_('character_loaded', characterData.firstname .. ' ' .. characterData.lastname), 'success', 5000)
     
-    -- Kezdő csomag (ha új karakter)
-    if characterData.is_new then
-        Citizen.SetTimeout(2000, function()
-            Account.GiveStartingKit()
-            
-            -- Tutorial
-            if Config.Tutorial and Config.Tutorial.Enable and Config.Tutorial.ShowForNewPlayers then
-                Citizen.SetTimeout(3000, function()
-                    Account.ShowTutorial()
-                end)
-            end
-        end)
-    end
-    
-    -- Karakter betöltve trigger (ll-core-nak)
+    -- Events
     TriggerEvent('ll-core:client:characterLoaded', characterData)
     TriggerServerEvent('ll-account:server:characterSpawned', characterData.id)
     
-    Account.Debug('Character spawned successfully - IN GAME NOW')
+    Account.Debug('Existing character spawned successfully')
 end)
 
--- Kezdő csomag kiosztása
+-- Kezdő csomag
 function Account.GiveStartingKit()
     if not Config.StartingKit or not Config.StartingKit.Enable then return end
     
@@ -235,7 +409,7 @@ function Account.GiveStartingKit()
         end
     end
     
-    -- Kezdő pénz (ll-core)
+    -- Kezdő pénz
     if Config.StartingKit.Money then
         if Config.StartingKit.Money.cash and Config.StartingKit.Money.cash > 0 then
             TriggerServerEvent('ll-account:server:addStartingMoney', 'cash', Config.StartingKit.Money.cash)
@@ -248,7 +422,7 @@ function Account.GiveStartingKit()
         end
     end
     
-    -- Apokalipszis kezdő státuszok szerverhez
+    -- Apokalipszis stats
     if Config.StartingKit.ApocalypseStats then
         TriggerServerEvent('ll-account:server:setStartingStats', Config.StartingKit.ApocalypseStats)
     end

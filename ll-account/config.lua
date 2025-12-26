@@ -57,17 +57,11 @@ Config.Spawn = {
     -- Létező karakter spawn
     UseLastPosition = true,      -- Utolsó pozíció használata
     DefaultSpawn = vector4(-1037.97, -2738.61, 20.17, 329.39), -- Ha nincs mentett pozíció
-    
-    -- Spawn kamera
-    EnableSpawnCam = true,
-    CameraPosition = vector3(-1040.0, -2740.0, 25.0),
-    CameraRotation = vector3(-20.0, 0.0, 45.0),
-    CameraFov = 50.0
 }
 
 -- Karakter kreátor beállítások
 Config.Creator = {
-    EnableAdvanced = true,       -- Részletes testreszabás (később ll-skin-nel)
+    EnableAdvanced = false,      -- FONTOS: FALSE - ll-skin-t használjuk spawn után!
     
     -- Alap megjelenés opciók
     Gender = {
@@ -78,13 +72,13 @@ Config.Creator = {
     -- Kezdő ruhák (alap)
     DefaultClothes = {
         Male = {
-            tshirt = {1, 0},
+            tshirt = {15, 0},
             torso = {15, 0},
             legs = {21, 0},
             shoes = {34, 0}
         },
         Female = {
-            tshirt = {1, 0},
+            tshirt = {14, 0},
             torso = {15, 0},
             legs = {21, 0},
             shoes = {35, 0}
@@ -233,4 +227,10 @@ Config.Logging = {
     LogCharacterCreation = true,
     LogCharacterDeletion = true,
     LogCharacterSelection = true
+}
+
+-- Session beállítások
+Config.Session = {
+    EnableTimeout = false,       -- AFK timeout
+    TimeoutMinutes = 30          -- Percek inaktivitás után
 }
